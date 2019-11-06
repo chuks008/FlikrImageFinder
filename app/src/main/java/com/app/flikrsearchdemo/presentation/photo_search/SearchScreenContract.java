@@ -32,6 +32,8 @@ public interface SearchScreenContract {
          * Show the loading indicators in the view
          */
         void showLoading();
+
+        void showSelected(String photoTitle);
     }
 
     interface UserActionListener {

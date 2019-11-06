@@ -7,4 +7,7 @@ import com.google.gson.annotations.SerializedName
  */
 data class ResultPhoto(@SerializedName("id") val photoId: String,
                        @SerializedName("owner") val ownerId: String,
-                       @SerializedName("title") val photoTitle: String)
+                       @SerializedName("title") val photoTitle: String,
+                       @SerializedName("farm") val farmId: Int,
+                       @SerializedName("server") val serverId: String,
+                       @SerializedName("secret") val secret: String)

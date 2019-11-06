@@ -21,20 +21,10 @@ class PhotoSearchRepositoryImpl @Inject constructor(private val imageApi: FlikrA
     override fun queryImage(
         perPage: Int,
         page: Int,
-        vararg query: String
+         query: String
     ): Single<SearchResultResponse> {
-
-        var tagKeyWords = ""
-
-        query.forEach {keyword ->
-            tagKeyWords += "$keyword,"
-        }
-
-        tagKeyWords = tagKeyWords.substring(0, tagKeyWords.length - 1)
-
         return imageApi.searchImages(
-            Constants.IMAGE_SEARCH_METHOD,
-            tagKeyWords,
+            query,
             page)
     }
 }

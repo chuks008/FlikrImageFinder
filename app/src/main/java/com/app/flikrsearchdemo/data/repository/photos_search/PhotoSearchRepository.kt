@@ -8,5 +8,5 @@ import io.reactivex.Single
  */
 interface PhotoSearchRepository {
 
-    fun queryImage(perPage: Int, page: Int, vararg query: String): Single<SearchResultResponse>
+    fun queryImage(perPage: Int, page: Int, query: String): Single<SearchResultResponse>
 }

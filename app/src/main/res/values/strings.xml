@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">Flikr Search Demo</string>
+    <string name="search_hint">Search photos here...</string>
 </resources>

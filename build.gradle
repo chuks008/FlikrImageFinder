@@ -17,6 +17,8 @@ buildscript {
     ext.mockito_version = '2.1.0'
     ext.rxJava_version = '2.2.14'
     ext.rxAndroid_version = '2.1.1'
+    ext.swipe_refresh_layout_version = '1.0.0'
+    ext.glide_version = '4.10.0'
 
     repositories {
         google()

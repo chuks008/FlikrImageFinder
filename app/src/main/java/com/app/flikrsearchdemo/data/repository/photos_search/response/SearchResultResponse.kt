@@ -7,6 +7,6 @@ import com.google.gson.annotations.SerializedName
  */
 
 
-data class SearchResultResponse(@SerializedName("photos") val photoResult: PhotoResult,
+data class SearchResultResponse(@SerializedName("photos") val photoResult: PhotoResultResponse,
                                 @SerializedName("stat") val statusMessage: String,
                                 @SerializedName("message") val errorMessage: String)

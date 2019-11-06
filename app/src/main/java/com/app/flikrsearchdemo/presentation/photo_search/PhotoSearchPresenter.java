@@ -3,10 +3,13 @@ package com.app.flikrsearchdemo.presentation.photo_search;
 import com.app.flikrsearchdemo.Constants;
 import com.app.flikrsearchdemo.data.repository.photos_search.PhotoSearchRepository;
 import com.app.flikrsearchdemo.data.repository.photos_search.SearchPhoto;
-import com.app.flikrsearchdemo.data.repository.photos_search.response.PhotoResult;
 import com.app.flikrsearchdemo.data.repository.photos_search.response.ResultPhoto;
 import com.app.flikrsearchdemo.data.repository.photos_search.response.SearchResultResponse;
 import com.app.flikrsearchdemo.executors.AppTaskExecutor;
+import com.app.flikrsearchdemo.presentation.adapter.photos.PhotoConnector;
+import com.app.flikrsearchdemo.presentation.adapter.photos.PhotoRow;
+
+import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,7 +23,8 @@ import io.reactivex.disposables.Disposable;
 /**
  * Created by Your name on 2019-11-05.
  */
-public class PhotoSearchPresenter implements SearchScreenContract.UserActionListener {
+public class PhotoSearchPresenter implements SearchScreenContract.UserActionListener,
+        PhotoConnector {
 
     private SearchScreenContract.View view;
     private PhotoSearchRepository photoSearchRepository;
@@ -56,7 +60,41 @@ public class PhotoSearchPresenter implements SearchScreenContract.UserActionList
                 .subscribe(new PhotoRequestObserver());
     }
 
+    @Override
+    public void bind(@NotNull PhotoRow photo, int position) {
+        SearchPhoto currentItem = photoSearchResults.get(position);
+        photo.setTitle(currentItem.getPhotoTitle());
+        photo.setPosition(position);
+        photo.setImage(String.format(Constants.IMAGE_LOAD_URL,
+                currentItem.getFarmId(),
+                currentItem.getServerId(),
+                currentItem.getPhotoId(),
+                currentItem.getSecret()));
+    }
+
+    @Override
+    public int getItemCount() {
+        return photoSearchResults.size();
+    }
+
+    @Override
+    public void onSelectItem(int position) {
+        view.showSelected(photoSearchResults.get(position).getPhotoTitle());
+    }
+
     private final class PhotoRequestObserver implements SingleObserver<SearchResultResponse> {
+
+        private SearchPhoto generateSearchPhoto(ResultPhoto photo) {
+            return new SearchPhoto.Builder()
+                    .photoId(photo.getPhotoId())
+                    .ownerId(photo.getOwnerId())
+                    .photoTitle(photo.getPhotoTitle())
+                    .farmId(photo.getFarmId())
+                    .serverId(photo.getServerId())
+                    .secret(photo.getSecret())
+                    .build();
+        }
+
         @Override
         public void onSubscribe(Disposable d) {
 
@@ -70,9 +108,7 @@ public class PhotoSearchPresenter implements SearchScreenContract.UserActionList
             if(searchResultResponse.getStatusMessage().equals("ok")){
                 List<ResultPhoto> photos = searchResultResponse.getPhotoResult().getPhotoResultList();
                 for(ResultPhoto photo: photos) {
-                    photoSearchResults.add(new SearchPhoto(photo.getPhotoId(),
-                            photo.getOwnerId(),
-                            photo.getPhotoTitle()));
+                    photoSearchResults.add(generateSearchPhoto(photo));
                 }
 
                 System.out.println("Total results: "+ photoSearchResults.size());

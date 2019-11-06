@@ -2,10 +2,23 @@ package com.app.flikrsearchdemo.presentation.photo_search;
 
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.widget.SearchView;
+import androidx.appcompat.widget.Toolbar;
+import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.app.flikrsearchdemo.R;
+import com.app.flikrsearchdemo.presentation.adapter.photos.PhotoListAdapter;
 
 import javax.inject.Inject;
 
@@ -18,19 +31,65 @@ public class PhotoSearchActivity extends DaggerAppCompatActivity implements Sear
 
     private static final String TAG = PhotoSearchActivity.class.getSimpleName();
 
+    private Toolbar toolbar;
+    private RecyclerView photoRecyclerView;
+    private PhotoListAdapter photoListAdapter;
+    private SwipeRefreshLayout swipeRefreshLayout;
+
     @Inject
     PhotoSearchPresenter presenter;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+
+        setContentView(R.layout.photo_list_layout);
+
+        toolbar = findViewById(R.id.mainScreenToolbar);
+        setSupportActionBar(toolbar);
+        getSupportActionBar().setTitle(getResources().getString(R.string.app_name));
 
         presenter.setView(this);
 
-        Log.e(TAG, "Starting search activities");
-        presenter.searchForPhotos("cats,kittens,dogs");
+        photoRecyclerView = findViewById(R.id.photoRecyclerView);
+        photoListAdapter = new PhotoListAdapter(presenter);
+        photoRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+        photoRecyclerView.setAdapter(photoListAdapter);
 
+        Log.e(TAG, "Starting search activities");
+
+    }
+
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.main_menu, menu);
+        MenuItem searchIcon = menu.findItem(R.id.action_search);
+        SearchView searchView = (SearchView) searchIcon.getActionView();
+        searchView.setQueryHint(getResources().getString(R.string.search_hint));
+
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                presenter.searchForPhotos(query);
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                return false;
+            }
+        });
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.action_favorites:
+                break;
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     @Override
@@ -45,7 +104,7 @@ public class PhotoSearchActivity extends DaggerAppCompatActivity implements Sear
 
     @Override
     public void updatePhotoList() {
-
+        photoListAdapter.notifyDataSetChanged();
     }
 
     @Override
@@ -56,5 +115,10 @@ public class PhotoSearchActivity extends DaggerAppCompatActivity implements Sear
     @Override
     public void showLoading() {
 
+    }
+
+    @Override
+    public void showSelected(String photoTitle) {
+        Toast.makeText(this, photoTitle, Toast.LENGTH_SHORT).show();
     }
 }
