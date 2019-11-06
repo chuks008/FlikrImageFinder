@@ -29,7 +29,6 @@ import io.reactivex.disposables.Disposable;
 /**
  * Created by Your name on 2019-11-05.
  */
-@Singleton
 public class PhotoSearchPresenter implements SearchScreenContract.UserActionListener,
         PhotoConnector, SearchTermConnector {
 
@@ -59,6 +58,7 @@ public class PhotoSearchPresenter implements SearchScreenContract.UserActionList
 
     public void setView(SearchScreenContract.View view) {
         this.view = view;
+
     }
 
     @Override

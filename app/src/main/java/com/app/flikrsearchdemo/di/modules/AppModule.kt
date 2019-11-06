@@ -38,19 +38,16 @@ class AppModule {
     }
 
     @Provides
-    @Singleton
     fun providesSharedPreferences(context: Application): SharedPreferences {
         return context.getSharedPreferences("app_preferences", Context.MODE_PRIVATE)
     }
 
     @Provides
-    @Singleton
     fun providesPhotoSearchRepo(photoSearchRepo: PhotoSearchRepositoryImpl): PhotoSearchRepository {
         return photoSearchRepo
     }
 
     @Provides
-    @Singleton
     fun providesSearchTermRepository(searchTermRepository: SearchTermRepositoryImpl): SearchTermRepository {
         return searchTermRepository
     }

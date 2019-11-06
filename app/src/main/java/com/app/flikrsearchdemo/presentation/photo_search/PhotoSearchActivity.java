@@ -3,6 +3,7 @@ package com.app.flikrsearchdemo.presentation.photo_search;
 import android.app.SearchManager;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.PersistableBundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -103,7 +104,7 @@ public class PhotoSearchActivity extends DaggerAppCompatActivity implements Sear
             @Override
             public boolean onQueryTextSubmit(String query) {
                 presenter.onNewPhotoSearch(query);
-                return false;
+                return true;
             }
 
             @Override
@@ -169,9 +170,9 @@ public class PhotoSearchActivity extends DaggerAppCompatActivity implements Sear
 
     @Override
     protected void onDestroy() {
+        super.onDestroy();
 
         presenter.saveSearchTerms();
-        super.onDestroy();
 
     }
 

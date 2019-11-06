@@ -9,7 +9,6 @@ import java.util.*
 import javax.inject.Inject
 import javax.inject.Singleton
 
-@Singleton
 class SearchTermRepositoryImpl @Inject constructor(private val sharedPreferences: SharedPreferences,
                                                    private val gson: Gson): SearchTermRepository {
 
@@ -17,6 +16,7 @@ class SearchTermRepositoryImpl @Inject constructor(private val sharedPreferences
     private var searchTerms = LinkedList<String>()
 
     init {
+        Log.e(TAG, "Initializing terms")
         val searchTermsString = sharedPreferences.getString("search_term_string", null)
         if(searchTermsString != null) {
             searchTerms = gson.fromJson(searchTermsString, object: TypeToken<LinkedList<String>>(){}.type)

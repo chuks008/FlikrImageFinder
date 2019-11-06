@@ -36,7 +36,7 @@ class PhotoDetailActivity: AppCompatActivity() {
 
         setSupportActionBar(detailScreenToolbar)
         supportActionBar!!.setDisplayHomeAsUpEnabled(true)
-        supportActionBar!!.setTitle("Back")
+        supportActionBar!!.title = "Back"
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
