@@ -39,6 +39,10 @@ public interface SearchScreenContract {
 
         void showSelected(String photoTitle, String photoUrl);
         void updateSearchTerms();
+
+        void showBookmarkSuccess(String message);
+
+        void checkPermissions();
     }
 
     interface UserActionListener {
@@ -54,5 +58,6 @@ public interface SearchScreenContract {
         void getSearchTerms();
         void saveSearchTerms();
         void refreshPhotoList();
+        void saveCurrentPhoto();
     }
 }

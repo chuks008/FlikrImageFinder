@@ -4,6 +4,8 @@ import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.Query
+import io.reactivex.Completable
+import io.reactivex.Single
 
 /**
  * Created by Your name on 2019-11-05.
@@ -12,7 +14,7 @@ import androidx.room.Query
 interface FavoritePhotoDao {
 
     @Query("SELECT * FROM favorite_photos")
-    fun getPhotos(): List<FavoritePhoto>
+    fun getPhotos(): Single<List<FavoritePhoto>>
 
     @Insert
     fun addFavoritePhoto(imageTitle: String, fileLocation: String)

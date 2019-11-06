@@ -1,6 +1,11 @@
 package com.app.flikrsearchdemo.presentation.photo_search;
 
+import android.graphics.Bitmap;
+
 import com.app.flikrsearchdemo.Constants;
+import com.app.flikrsearchdemo.data.file_management.FileSaverMgr;
+import com.app.flikrsearchdemo.data.file_management.OnImageDownloadComplete;
+import com.app.flikrsearchdemo.data.repository.favorites.FavoritePhotoRepository;
 import com.app.flikrsearchdemo.data.repository.photos_search.PhotoSearchRepository;
 import com.app.flikrsearchdemo.data.repository.photos_search.SearchPhoto;
 import com.app.flikrsearchdemo.data.repository.photos_search.response.ResultPhoto;
@@ -30,27 +35,31 @@ import io.reactivex.disposables.Disposable;
  * Created by Your name on 2019-11-05.
  */
 public class PhotoSearchPresenter implements SearchScreenContract.UserActionListener,
-        PhotoConnector, SearchTermConnector {
+        PhotoConnector, SearchTermConnector, OnImageDownloadComplete {
 
     private SearchScreenContract.View view;
     private PhotoSearchRepository photoSearchRepository;
     private SearchTermRepository searchTermRepository;
     private AppTaskExecutor backgroundExecutor;
     private AppTaskExecutor postTaskExecutor;
+    private FavoritePhotoRepository favoritePhotoRepository;
 
     private int currentPage = 1;
     private String currentTag = "";
+    private int currentPhotoPosition = 0;
     private List<SearchPhoto> photoSearchResults = new ArrayList<>();
     private LinkedList<String> searchTerms = new LinkedList<>();
 
     @Inject
     PhotoSearchPresenter(PhotoSearchRepository photoSearchRepository,
-                                SearchTermRepository searchTermRepository,
-                                @Named(Constants.BACKGROUND_THREAD_KEY) AppTaskExecutor backgroundExecutor,
-                                @Named(Constants.MAIN_THREAD_KEY) AppTaskExecutor postTaskExecutor) {
+                         SearchTermRepository searchTermRepository,
+                         FavoritePhotoRepository favoritePhotoRepository,
+                         @Named(Constants.BACKGROUND_THREAD_KEY) AppTaskExecutor backgroundExecutor,
+                         @Named(Constants.MAIN_THREAD_KEY) AppTaskExecutor postTaskExecutor) {
 
         this.photoSearchRepository = photoSearchRepository;
         this.searchTermRepository = searchTermRepository;
+        this.favoritePhotoRepository = favoritePhotoRepository;
         this.backgroundExecutor = backgroundExecutor;
         this.postTaskExecutor = postTaskExecutor;
 
@@ -58,7 +67,6 @@ public class PhotoSearchPresenter implements SearchScreenContract.UserActionList
 
     public void setView(SearchScreenContract.View view) {
         this.view = view;
-
     }
 
     /**
@@ -218,7 +226,31 @@ public class PhotoSearchPresenter implements SearchScreenContract.UserActionList
 
     @Override
     public void onBookmarkPhoto(int position) {
-        System.out.println("Soon saving: "+ photoSearchResults.get(position).getPhotoTitle());
+
+        currentPhotoPosition = position;
+        view.checkPermissions();
+    }
+
+    @Override
+    public void saveCurrentPhoto() {
+        SearchPhoto photo = photoSearchResults.get(currentPhotoPosition);
+
+        System.out.println("Saving: "+photo.getPhotoTitle());
+
+        favoritePhotoRepository.addPhoto(photo.getPhotoTitle(),
+                generateImageUrl(photo),
+                this);
+    }
+
+    @Override
+    public void onCompleteImageSave(boolean error, @NotNull String message) {
+
+        if(error) {
+            view.showError(message);
+        } else {
+            view.showBookmarkSuccess(message);
+        }
+
     }
 
     private final class PhotoRequestObserver implements SingleObserver<SearchResultResponse> {

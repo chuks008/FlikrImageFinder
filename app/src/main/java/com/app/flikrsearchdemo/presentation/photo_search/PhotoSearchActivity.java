@@ -1,37 +1,29 @@
 package com.app.flikrsearchdemo.presentation.photo_search;
 
-import android.app.SearchManager;
+import android.Manifest;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
-import android.os.PersistableBundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
-import android.widget.CursorAdapter;
-import android.widget.SimpleCursorAdapter;
-import android.widget.Spinner;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.SearchView;
 import androidx.appcompat.widget.Toolbar;
-import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.app.flikrsearchdemo.R;
-import com.app.flikrsearchdemo.data.repository.photos_search.SearchPhoto;
 import com.app.flikrsearchdemo.presentation.PhotoDetailActivity;
 import com.app.flikrsearchdemo.presentation.adapter.photos.PhotoListAdapter;
 import com.app.flikrsearchdemo.presentation.adapter.search_term.SearchTermAdapter;
-
-import java.util.ArrayList;
-import java.util.List;
 
 import javax.inject.Inject;
 
@@ -50,7 +42,7 @@ public class PhotoSearchActivity extends DaggerAppCompatActivity implements Sear
     private SwipeRefreshLayout swipeRefreshLayout;
     private SearchTermAdapter searchTermAdapter;
     private RecyclerView searchTermRecyclerView;
-    private SearchView searchView;
+    private static final int WRITE_STORAGE_REQUEST = 101;
 
     @Inject
     PhotoSearchPresenter presenter;
@@ -97,7 +89,7 @@ public class PhotoSearchActivity extends DaggerAppCompatActivity implements Sear
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.main_menu, menu);
         MenuItem searchIcon = menu.findItem(R.id.action_search);
-        searchView = (SearchView) searchIcon.getActionView();
+        SearchView searchView = (SearchView) searchIcon.getActionView();
         searchView.setQueryHint(getResources().getString(R.string.search_hint));
 
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
@@ -151,6 +143,12 @@ public class PhotoSearchActivity extends DaggerAppCompatActivity implements Sear
     }
 
     @Override
+    public void showBookmarkSuccess(String message) {
+        Log.e(TAG, message);
+        Toast.makeText(this, message, Toast.LENGTH_LONG).show();
+    }
+
+    @Override
     public void showSelected(String photoTitle, String photoUrl) {
         Bundle detailBundle = new Bundle();
         detailBundle.putString("title", photoTitle);
@@ -166,6 +164,45 @@ public class PhotoSearchActivity extends DaggerAppCompatActivity implements Sear
     public void updateSearchTerms() {
         searchTermAdapter.notifyDataSetChanged();
         searchTermRecyclerView.smoothScrollToPosition(0);
+    }
+
+    @Override
+    public void checkPermissions() {
+        if(Build.VERSION.SDK_INT < 23) {
+            presenter.saveCurrentPhoto();
+            return;
+        }
+
+        if (ContextCompat.checkSelfPermission(this,
+                Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                != PackageManager.PERMISSION_GRANTED) {
+
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
+                    WRITE_STORAGE_REQUEST);
+        } else {
+            presenter.saveCurrentPhoto();
+        }
+
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode,
+                                           String[] permissions, int[] grantResults) {
+        switch (requestCode) {
+            case WRITE_STORAGE_REQUEST: {
+                // If request is cancelled, the result arrays are empty.
+                if (grantResults.length > 0
+                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    presenter.saveCurrentPhoto();
+                } else {
+                    Toast.makeText(this,
+                            "Please grant write storage access to save photos",
+                            Toast.LENGTH_LONG).show();
+                }
+                return;
+            }
+        }
     }
 
     @Override
