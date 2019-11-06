@@ -7,4 +7,5 @@ interface PhotoConnector {
     fun bind(photo: PhotoRow, position: Int)
     fun getItemCount(): Int
     fun onSelectItem(position: Int)
+    fun onBookmarkPhoto(position: Int)
 }

@@ -61,6 +61,12 @@ public class PhotoSearchPresenter implements SearchScreenContract.UserActionList
 
     }
 
+    /**
+     *
+     *
+     * @param searchTermRow
+     * @param position
+     */
     @Override
     public void bind(@NotNull SearchTermRow searchTermRow, int position) {
         String currentSearchTerm = searchTerms.get(position);
@@ -68,16 +74,27 @@ public class PhotoSearchPresenter implements SearchScreenContract.UserActionList
         searchTermRow.setPosition(position);
     }
 
+    /**
+     *
+     * @return
+     */
     @Override
     public int getCount() {
         return searchTerms.size();
     }
 
+    /**
+     *
+     * @param position
+     */
     @Override
     public void onSelectSearchTerm(int position) {
         onNewPhotoSearch(searchTerms.get(position));
     }
 
+    /**
+     *
+     */
     @Override
     public void getSearchTerms() {
 
@@ -85,12 +102,19 @@ public class PhotoSearchPresenter implements SearchScreenContract.UserActionList
         searchTerms.addAll(searchTermRepository.getSearchTerms());
     }
 
+    /**
+     *
+     */
     private void resetSearch() {
         currentPage = 1;
         photoSearchResults.clear();
         view.updatePhotoList();
     }
 
+    /**
+     *
+     * @param tags
+     */
     @Override
     public void onNewPhotoSearch(String tags) {
 
@@ -112,19 +136,28 @@ public class PhotoSearchPresenter implements SearchScreenContract.UserActionList
         searchForPhotos(currentTag);
     }
 
+    /**
+     *
+     */
     @Override
     public void refreshPhotoList() {
         resetSearch();
         searchForPhotos(currentTag);
     }
 
+    /**
+     *
+     */
     @Override
     public void loadMorePhotos() {
         currentPage += 1;
         searchForPhotos(currentTag);
     }
 
-
+    /**
+     *
+     * @param tags
+     */
     private void searchForPhotos(String tags) {
 
         view.showLoading();
@@ -135,6 +168,12 @@ public class PhotoSearchPresenter implements SearchScreenContract.UserActionList
                 .subscribe(new PhotoRequestObserver());
     }
 
+    /**
+     *
+     *
+     * @param photo
+     * @param position
+     */
     @Override
     public void bind(@NotNull PhotoRow photo, int position) {
         SearchPhoto currentItem = photoSearchResults.get(position);
@@ -143,6 +182,11 @@ public class PhotoSearchPresenter implements SearchScreenContract.UserActionList
         photo.setImage(generateImageUrl(currentItem));
     }
 
+    /**
+     *
+     * @param photo
+     * @return
+     */
     private String generateImageUrl(SearchPhoto photo) {
         return String.format(Constants.IMAGE_LOAD_URL,
                 photo.getFarmId(),
@@ -151,11 +195,19 @@ public class PhotoSearchPresenter implements SearchScreenContract.UserActionList
                 photo.getSecret());
     }
 
+    /**
+     *
+     * @return
+     */
     @Override
     public int getItemCount() {
         return photoSearchResults.size();
     }
 
+    /**
+     *
+     * @param position
+     */
     @Override
     public void onSelectItem(int position) {
         SearchPhoto photo = photoSearchResults.get(position);
@@ -164,8 +216,18 @@ public class PhotoSearchPresenter implements SearchScreenContract.UserActionList
                 generateImageUrl(photo));
     }
 
+    @Override
+    public void onBookmarkPhoto(int position) {
+        System.out.println("Soon saving: "+ photoSearchResults.get(position).getPhotoTitle());
+    }
+
     private final class PhotoRequestObserver implements SingleObserver<SearchResultResponse> {
 
+        /**
+         *
+         * @param photo
+         * @return
+         */
         private SearchPhoto generateSearchPhoto(ResultPhoto photo) {
             return new SearchPhoto.Builder()
                     .photoId(photo.getPhotoId())

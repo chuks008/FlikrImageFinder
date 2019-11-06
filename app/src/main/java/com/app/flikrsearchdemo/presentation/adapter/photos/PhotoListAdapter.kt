@@ -1,5 +1,8 @@
 package com.app.flikrsearchdemo.presentation.adapter.photos
 
+import android.app.AlertDialog
+import android.content.Context
+import android.content.DialogInterface
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -19,7 +22,7 @@ class PhotoListAdapter(private val photoConnector: PhotoConnector):
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PhotoListViewHolder {
         val itemView = LayoutInflater.from(parent.context).inflate(R.layout.search_gallery_item, parent, false)
-        return PhotoListViewHolder(itemView, photoConnector)
+        return PhotoListViewHolder(itemView, photoConnector, parent.context)
     }
 
     override fun getItemCount(): Int {
@@ -30,17 +33,38 @@ class PhotoListAdapter(private val photoConnector: PhotoConnector):
         photoConnector.bind(holder, position)
     }
 
-    class PhotoListViewHolder(itemView: View, listener: PhotoConnector):
+    class PhotoListViewHolder(itemView: View, photoConnector: PhotoConnector, context: Context):
         RecyclerView.ViewHolder(itemView), PhotoRow {
 
-        val imageTitle = itemView.findViewById<TextView>(R.id.imageTitleText)
-        val photoImage = itemView.findViewById<ImageView>(R.id.photoImageView)
-        val photoLikeBtn = itemView.findViewById<ImageButton>(R.id.bookmarkImageBtn)
-        var currentPosition: Int = 0
+        private val imageTitle: TextView = itemView.findViewById(R.id.imageTitleText)
+        private val photoImage: ImageView = itemView.findViewById(R.id.photoImageView)
+        private val photoLikeBtn: ImageButton = itemView.findViewById(R.id.bookmarkImageBtn)
+        private var currentPosition: Int = 0
 
         init {
             itemView.setOnClickListener {
-                listener.onSelectItem(currentPosition)
+                photoConnector.onSelectItem(currentPosition)
+            }
+
+            photoLikeBtn.setOnClickListener {
+                AlertDialog.Builder(context).run {
+                    setTitle("Adding photo to favorites")
+                    setMessage("Would you like to add this photo to your favorites?")
+                    setPositiveButton("yes", DialogInterface.OnClickListener {
+                            dialogInterface, i ->
+
+                        photoConnector.onBookmarkPhoto(currentPosition)
+                        dialogInterface.dismiss()
+                    })
+
+                    setNegativeButton("cancel", DialogInterface.OnClickListener {
+                            dialogInterface, i ->
+                        dialogInterface.dismiss()
+                    })
+
+                    show()
+                }
+
             }
         }
 
