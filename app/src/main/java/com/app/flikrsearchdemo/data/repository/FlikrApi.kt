@@ -17,9 +17,9 @@ interface FlikrApi {
     @GET("services/rest")
     fun searchImages(@Query("method") method: String,
                      @Query("tags") searchTags: String,
-                     @Query("per_page") pageLimit: Int = 25,
                      @Query("page") page: Int,
-                     @Query("api_key") apiKey: String = "",
+                     @Query("per_page") pageLimit: Int = 25,
+                     @Query("api_key") apiKey: String = Constants.FLIKR_API_KEY,
                      @Query("format") format: String = "json",
                      @Query("nojsoncallback") jsonCallackStatus: Int = 1): Single<SearchResultResponse>
 

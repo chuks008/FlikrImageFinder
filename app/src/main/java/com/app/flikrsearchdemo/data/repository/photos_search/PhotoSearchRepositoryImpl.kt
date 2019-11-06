@@ -1,5 +1,6 @@
 package com.app.flikrsearchdemo.data.repository.photos_search
 
+import android.util.Log
 import com.app.flikrsearchdemo.Constants
 import com.app.flikrsearchdemo.data.repository.FlikrApi
 import com.app.flikrsearchdemo.data.repository.photos_search.response.SearchResultResponse
@@ -14,6 +15,8 @@ import javax.inject.Singleton
 
 @Singleton
 class PhotoSearchRepositoryImpl @Inject constructor(private val imageApi: FlikrApi): PhotoSearchRepository {
+
+    private val TAG = PhotoSearchRepositoryImpl::class.java.simpleName
 
     override fun queryImage(
         perPage: Int,
@@ -32,8 +35,6 @@ class PhotoSearchRepositoryImpl @Inject constructor(private val imageApi: FlikrA
         return imageApi.searchImages(
             Constants.IMAGE_SEARCH_METHOD,
             tagKeyWords,
-            perPage,
-            page,
-            "")
+            page)
     }
 }
