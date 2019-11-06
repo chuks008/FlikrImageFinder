@@ -7,6 +7,9 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.CursorAdapter;
+import android.widget.SimpleCursorAdapter;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -23,6 +26,9 @@ import com.app.flikrsearchdemo.data.repository.photos_search.SearchPhoto;
 import com.app.flikrsearchdemo.presentation.PhotoDetailActivity;
 import com.app.flikrsearchdemo.presentation.adapter.photos.PhotoListAdapter;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.inject.Inject;
 
 import dagger.android.support.DaggerAppCompatActivity;
@@ -38,6 +44,8 @@ public class PhotoSearchActivity extends DaggerAppCompatActivity implements Sear
     private RecyclerView photoRecyclerView;
     private PhotoListAdapter photoListAdapter;
     private SwipeRefreshLayout swipeRefreshLayout;
+    private ArrayAdapter<String> suggestionAdapter;
+    private List<String> pastSearchTerms = new ArrayList<>();
 
     @Inject
     PhotoSearchPresenter presenter;
@@ -58,6 +66,8 @@ public class PhotoSearchActivity extends DaggerAppCompatActivity implements Sear
         photoListAdapter = new PhotoListAdapter(presenter);
         photoRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         photoRecyclerView.setAdapter(photoListAdapter);
+
+        suggestionAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, pastSearchTerms);
 
         Log.e(TAG, "Starting search activities");
 
@@ -89,6 +99,9 @@ public class PhotoSearchActivity extends DaggerAppCompatActivity implements Sear
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         switch (item.getItemId()) {
+            case R.id.action_search:
+                presenter.getSearchTerms();
+                break;
             case R.id.action_favorites:
                 break;
         }
@@ -130,6 +143,22 @@ public class PhotoSearchActivity extends DaggerAppCompatActivity implements Sear
         Intent detailIntent = new Intent(this, PhotoDetailActivity.class);
         detailIntent.putExtras(detailBundle);
         startActivity(detailIntent);
+    }
+
+    @Override
+    public void showSearchTags(List<String> searchTerms) {
+        pastSearchTerms.clear();
+        pastSearchTerms.addAll(searchTerms);
+        suggestionAdapter.notifyDataSetChanged();
+        Log.e(TAG, "Total number of items: "+searchTerms.size());
+    }
+
+    @Override
+    protected void onDestroy() {
+
+        presenter.saveSearchTerms();
+        super.onDestroy();
+
     }
 
 }

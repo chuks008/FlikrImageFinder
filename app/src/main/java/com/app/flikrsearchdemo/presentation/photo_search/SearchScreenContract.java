@@ -2,6 +2,8 @@ package com.app.flikrsearchdemo.presentation.photo_search;
 
 import com.app.flikrsearchdemo.data.repository.photos_search.SearchPhoto;
 
+import java.util.List;
+
 /**
  * Created by Your name on 2019-11-05.
  */
@@ -36,6 +38,8 @@ public interface SearchScreenContract {
         void showLoading();
 
         void showSelected(String photoTitle, String photoUrl);
+
+        void showSearchTags(List<String> searchTerms);
     }
 
     interface UserActionListener {
@@ -46,5 +50,7 @@ public interface SearchScreenContract {
          * @param tags: String
          */
         void searchForPhotos(String tags);
+        void getSearchTerms();
+        void saveSearchTerms();
     }
 }

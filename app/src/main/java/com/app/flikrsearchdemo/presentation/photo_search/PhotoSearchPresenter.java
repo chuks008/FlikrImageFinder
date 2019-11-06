@@ -5,6 +5,8 @@ import com.app.flikrsearchdemo.data.repository.photos_search.PhotoSearchReposito
 import com.app.flikrsearchdemo.data.repository.photos_search.SearchPhoto;
 import com.app.flikrsearchdemo.data.repository.photos_search.response.ResultPhoto;
 import com.app.flikrsearchdemo.data.repository.photos_search.response.SearchResultResponse;
+import com.app.flikrsearchdemo.data.repository.search_terms.SearchTermRepository;
+import com.app.flikrsearchdemo.data.repository.search_terms.SearchTermRepositoryImpl;
 import com.app.flikrsearchdemo.executors.AppTaskExecutor;
 import com.app.flikrsearchdemo.presentation.adapter.photos.PhotoConnector;
 import com.app.flikrsearchdemo.presentation.adapter.photos.PhotoRow;
@@ -16,6 +18,7 @@ import java.util.List;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Singleton;
 
 import io.reactivex.SingleObserver;
 import io.reactivex.disposables.Disposable;
@@ -23,11 +26,13 @@ import io.reactivex.disposables.Disposable;
 /**
  * Created by Your name on 2019-11-05.
  */
+@Singleton
 public class PhotoSearchPresenter implements SearchScreenContract.UserActionListener,
         PhotoConnector {
 
     private SearchScreenContract.View view;
     private PhotoSearchRepository photoSearchRepository;
+    private SearchTermRepository searchTermRepository;
     private AppTaskExecutor backgroundExecutor;
     private AppTaskExecutor postTaskExecutor;
 
@@ -36,12 +41,15 @@ public class PhotoSearchPresenter implements SearchScreenContract.UserActionList
 
     @Inject
     PhotoSearchPresenter(PhotoSearchRepository photoSearchRepository,
+                                SearchTermRepository searchTermRepository,
                                 @Named(Constants.BACKGROUND_THREAD_KEY) AppTaskExecutor backgroundExecutor,
                                 @Named(Constants.MAIN_THREAD_KEY) AppTaskExecutor postTaskExecutor) {
 
         this.photoSearchRepository = photoSearchRepository;
+        this.searchTermRepository = searchTermRepository;
         this.backgroundExecutor = backgroundExecutor;
         this.postTaskExecutor = postTaskExecutor;
+
     }
 
     public void setView(SearchScreenContract.View view) {
@@ -49,10 +57,17 @@ public class PhotoSearchPresenter implements SearchScreenContract.UserActionList
     }
 
     @Override
+    public void getSearchTerms() {
+        view.showSearchTags(searchTermRepository.getSearchTerms());
+    }
+
+    @Override
     public void searchForPhotos(String tags) {
         view.showLoading();
 
         System.out.println("Searching for photos with tags "+ tags);
+
+        searchTermRepository.addNewSearchTerm(tags);
 
         photoSearchRepository.queryImage(currentPage, 25, tags)
                 .subscribeOn(backgroundExecutor.getScheduler())
@@ -140,5 +155,9 @@ public class PhotoSearchPresenter implements SearchScreenContract.UserActionList
         }
     }
 
-
+    @Override
+    public void saveSearchTerms() {
+        this.view = null;
+        searchTermRepository.saveSearchTerms();
+    }
 }
