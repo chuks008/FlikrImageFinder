@@ -28,6 +28,8 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import io.reactivex.Completable;
+import io.reactivex.CompletableObserver;
 import io.reactivex.SingleObserver;
 import io.reactivex.disposables.Disposable;
 
@@ -243,12 +245,30 @@ public class PhotoSearchPresenter implements SearchScreenContract.UserActionList
     }
 
     @Override
-    public void onCompleteImageSave(boolean error, @NotNull String message) {
+    public void onCompleteImageSave(boolean error, final @NotNull String message, Completable savePhotoToDBTask) {
 
         if(error) {
             view.showError(message);
         } else {
-            view.showBookmarkSuccess(message);
+            savePhotoToDBTask
+                    .subscribeOn(backgroundExecutor.getScheduler())
+                    .observeOn(postTaskExecutor.getScheduler())
+                    .subscribe(new CompletableObserver() {
+                        @Override
+                        public void onSubscribe(Disposable d) {
+
+                        }
+
+                        @Override
+                        public void onComplete() {
+                           view.showBookmarkSuccess(message);
+                        }
+
+                        @Override
+                        public void onError(Throwable e) {
+                            view.showError(e.getLocalizedMessage());
+                        }
+                    });
         }
 
     }

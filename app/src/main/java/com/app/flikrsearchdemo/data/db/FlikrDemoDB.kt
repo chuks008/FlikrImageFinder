@@ -14,7 +14,7 @@ import javax.inject.Singleton
  * Created by Your name on 2019-11-05.
  */
 
-@Database(entities = [FavoritePhoto::class], version = 2)
+@Database(entities = [FavoritePhoto::class], version = 1)
 abstract class FlikrDemoDB: RoomDatabase() {
 
     abstract fun favoritePhotoDao(): FavoritePhotoDao
@@ -33,7 +33,7 @@ abstract class FlikrDemoDB: RoomDatabase() {
                     context.applicationContext,
                     FlikrDemoDB::class.java,
                     "flikr_demo_db"
-                ).build()
+                ).fallbackToDestructiveMigration().build()
                 INSTANCE = instance
                 return instance
             }

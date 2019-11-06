@@ -59,6 +59,11 @@ class AppModule {
     }
 
     @Provides
+    fun providesDB(context: Application): FlikrDemoDB {
+        return FlikrDemoDB.getDatabase(context)
+    }
+
+    @Provides
     fun providesFileSaverMgr(fileSaverMgr: FileSaverMgrImpl): FileSaverMgr {
         return fileSaverMgr
     }

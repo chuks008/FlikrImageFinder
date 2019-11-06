@@ -17,9 +17,9 @@ interface FavoritePhotoDao {
     fun getPhotos(): Single<List<FavoritePhoto>>
 
     @Insert
-    fun addFavoritePhoto(imageTitle: String, fileLocation: String)
+    fun addFavoritePhoto(favoritePhoto: FavoritePhoto): Completable
 
     @Delete
-    fun deleteFavoritePhoto(id: Int)
+    fun deleteFavoritePhoto(favoritePhoto: FavoritePhoto)
 
 }
