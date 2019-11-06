@@ -52,6 +52,7 @@ class PhotoListAdapter(private val photoConnector: PhotoConnector):
             Glide.with(photoImage.context)
                 .load(imageUrl)
                 .apply(RequestOptions().placeholder(R.drawable.placeholder_img))
+                .centerCrop()
                 .into(photoImage)
         }
 

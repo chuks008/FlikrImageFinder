@@ -33,8 +33,7 @@
             android:id="@+id/photoImageView"
             android:layout_width="match_parent"
             android:layout_height="220dp"
-            android:src="@drawable/placeholder_img"
-            android:scaleType="centerCrop"/>
+            android:src="@drawable/placeholder_img" />
 
         <ImageButton
             android:id="@+id/bookmarkImageBtn"

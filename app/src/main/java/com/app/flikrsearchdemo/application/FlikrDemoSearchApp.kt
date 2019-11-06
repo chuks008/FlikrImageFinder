@@ -1,5 +1,7 @@
 package com.app.flikrsearchdemo.application
 
+import android.util.Log
+import android.widget.Toast
 import com.app.flikrsearchdemo.di.components.DaggerAppComponent
 import dagger.android.AndroidInjector
 import dagger.android.DaggerApplication
