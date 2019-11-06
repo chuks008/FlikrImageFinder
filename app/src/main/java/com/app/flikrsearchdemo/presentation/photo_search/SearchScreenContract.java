@@ -1,5 +1,7 @@
 package com.app.flikrsearchdemo.presentation.photo_search;
 
+import com.app.flikrsearchdemo.data.repository.photos_search.SearchPhoto;
+
 /**
  * Created by Your name on 2019-11-05.
  */
@@ -33,7 +35,7 @@ public interface SearchScreenContract {
          */
         void showLoading();
 
-        void showSelected(String photoTitle);
+        void showSelected(String photoTitle, String photoUrl);
     }
 
     interface UserActionListener {

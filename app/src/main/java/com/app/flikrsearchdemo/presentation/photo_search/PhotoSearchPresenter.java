@@ -65,11 +65,15 @@ public class PhotoSearchPresenter implements SearchScreenContract.UserActionList
         SearchPhoto currentItem = photoSearchResults.get(position);
         photo.setTitle(currentItem.getPhotoTitle());
         photo.setPosition(position);
-        photo.setImage(String.format(Constants.IMAGE_LOAD_URL,
-                currentItem.getFarmId(),
-                currentItem.getServerId(),
-                currentItem.getPhotoId(),
-                currentItem.getSecret()));
+        photo.setImage(generateImageUrl(currentItem));
+    }
+
+    private String generateImageUrl(SearchPhoto photo) {
+        return String.format(Constants.IMAGE_LOAD_URL,
+                photo.getFarmId(),
+                photo.getServerId(),
+                photo.getPhotoId(),
+                photo.getSecret());
     }
 
     @Override
@@ -79,7 +83,10 @@ public class PhotoSearchPresenter implements SearchScreenContract.UserActionList
 
     @Override
     public void onSelectItem(int position) {
-        view.showSelected(photoSearchResults.get(position).getPhotoTitle());
+        SearchPhoto photo = photoSearchResults.get(position);
+
+        view.showSelected(photo.getPhotoTitle(),
+                generateImageUrl(photo));
     }
 
     private final class PhotoRequestObserver implements SingleObserver<SearchResultResponse> {

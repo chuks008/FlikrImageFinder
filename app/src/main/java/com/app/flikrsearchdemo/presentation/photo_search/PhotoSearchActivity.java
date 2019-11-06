@@ -1,5 +1,6 @@
 package com.app.flikrsearchdemo.presentation.photo_search;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
@@ -18,6 +19,8 @@ import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.app.flikrsearchdemo.R;
+import com.app.flikrsearchdemo.data.repository.photos_search.SearchPhoto;
+import com.app.flikrsearchdemo.presentation.PhotoDetailActivity;
 import com.app.flikrsearchdemo.presentation.adapter.photos.PhotoListAdapter;
 
 import javax.inject.Inject;
@@ -118,7 +121,15 @@ public class PhotoSearchActivity extends DaggerAppCompatActivity implements Sear
     }
 
     @Override
-    public void showSelected(String photoTitle) {
-        Toast.makeText(this, photoTitle, Toast.LENGTH_SHORT).show();
+    public void showSelected(String photoTitle, String photoUrl) {
+        Bundle detailBundle = new Bundle();
+        detailBundle.putString("title", photoTitle);
+        detailBundle.putString("image_url", photoUrl);
+        detailBundle.putBoolean("from_search", true);
+
+        Intent detailIntent = new Intent(this, PhotoDetailActivity.class);
+        detailIntent.putExtras(detailBundle);
+        startActivity(detailIntent);
     }
+
 }
