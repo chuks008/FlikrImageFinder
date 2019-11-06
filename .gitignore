@@ -43,6 +43,8 @@ local.properties
 .idea/scopes/scope_settings.xml
 .idea/vcs.xml
 *.iml
+.idea/codeStyles/codeStyleConfig.xml
+
 
 .idea/
 
