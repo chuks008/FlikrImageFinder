@@ -19,7 +19,6 @@ class PhotoSearchRepositoryImpl @Inject constructor(private val imageApi: FlikrA
     private val TAG = PhotoSearchRepositoryImpl::class.java.simpleName
 
     override fun queryImage(
-        perPage: Int,
         page: Int,
          query: String
     ): Single<SearchResultResponse> {

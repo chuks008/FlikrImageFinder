@@ -1,5 +1,6 @@
 package com.app.flikrsearchdemo.presentation.photo_search;
 
+import android.app.SearchManager;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -10,6 +11,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.CursorAdapter;
 import android.widget.SimpleCursorAdapter;
+import android.widget.Spinner;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -25,6 +27,7 @@ import com.app.flikrsearchdemo.R;
 import com.app.flikrsearchdemo.data.repository.photos_search.SearchPhoto;
 import com.app.flikrsearchdemo.presentation.PhotoDetailActivity;
 import com.app.flikrsearchdemo.presentation.adapter.photos.PhotoListAdapter;
+import com.app.flikrsearchdemo.presentation.adapter.search_term.SearchTermAdapter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -44,8 +47,9 @@ public class PhotoSearchActivity extends DaggerAppCompatActivity implements Sear
     private RecyclerView photoRecyclerView;
     private PhotoListAdapter photoListAdapter;
     private SwipeRefreshLayout swipeRefreshLayout;
-    private ArrayAdapter<String> suggestionAdapter;
-    private List<String> pastSearchTerms = new ArrayList<>();
+    private SearchTermAdapter searchTermAdapter;
+    private RecyclerView searchTermRecyclerView;
+    private SearchView searchView;
 
     @Inject
     PhotoSearchPresenter presenter;
@@ -67,24 +71,38 @@ public class PhotoSearchActivity extends DaggerAppCompatActivity implements Sear
         photoRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         photoRecyclerView.setAdapter(photoListAdapter);
 
-        suggestionAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, pastSearchTerms);
+        searchTermRecyclerView = findViewById(R.id.pastTermsRecyclerView);
+        searchTermAdapter = new SearchTermAdapter(presenter);
+        searchTermRecyclerView.setLayoutManager(new LinearLayoutManager(this,
+                RecyclerView.HORIZONTAL,
+                false));
+        searchTermRecyclerView.setAdapter(searchTermAdapter);
 
+        presenter.getSearchTerms();
+
+        swipeRefreshLayout = findViewById(R.id.swipeRefresher);
+        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                presenter.refreshPhotoList();
+            }
+        });
         Log.e(TAG, "Starting search activities");
-
     }
+
 
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.main_menu, menu);
         MenuItem searchIcon = menu.findItem(R.id.action_search);
-        SearchView searchView = (SearchView) searchIcon.getActionView();
+        searchView = (SearchView) searchIcon.getActionView();
         searchView.setQueryHint(getResources().getString(R.string.search_hint));
 
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
-                presenter.searchForPhotos(query);
+                presenter.onNewPhotoSearch(query);
                 return false;
             }
 
@@ -93,15 +111,13 @@ public class PhotoSearchActivity extends DaggerAppCompatActivity implements Sear
                 return false;
             }
         });
+
         return super.onCreateOptionsMenu(menu);
     }
 
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         switch (item.getItemId()) {
-            case R.id.action_search:
-                presenter.getSearchTerms();
-                break;
             case R.id.action_favorites:
                 break;
         }
@@ -125,12 +141,12 @@ public class PhotoSearchActivity extends DaggerAppCompatActivity implements Sear
 
     @Override
     public void hideLoading() {
-
+        swipeRefreshLayout.setRefreshing(false);
     }
 
     @Override
     public void showLoading() {
-
+        swipeRefreshLayout.setRefreshing(true);
     }
 
     @Override
@@ -146,11 +162,9 @@ public class PhotoSearchActivity extends DaggerAppCompatActivity implements Sear
     }
 
     @Override
-    public void showSearchTags(List<String> searchTerms) {
-        pastSearchTerms.clear();
-        pastSearchTerms.addAll(searchTerms);
-        suggestionAdapter.notifyDataSetChanged();
-        Log.e(TAG, "Total number of items: "+searchTerms.size());
+    public void updateSearchTerms() {
+        searchTermAdapter.notifyDataSetChanged();
+        searchTermRecyclerView.smoothScrollToPosition(0);
     }
 
     @Override

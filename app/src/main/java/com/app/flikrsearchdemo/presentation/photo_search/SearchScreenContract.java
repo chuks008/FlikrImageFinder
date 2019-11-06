@@ -38,8 +38,7 @@ public interface SearchScreenContract {
         void showLoading();
 
         void showSelected(String photoTitle, String photoUrl);
-
-        void showSearchTags(List<String> searchTerms);
+        void updateSearchTerms();
     }
 
     interface UserActionListener {
@@ -47,10 +46,13 @@ public interface SearchScreenContract {
         /**
          * Search the presenter's data source for pictures using the tags set
          *
-         * @param tags: String
          */
-        void searchForPhotos(String tags);
+
+        void onNewPhotoSearch(String tags);
+        void loadMorePhotos();
+
         void getSearchTerms();
         void saveSearchTerms();
+        void refreshPhotoList();
     }
 }

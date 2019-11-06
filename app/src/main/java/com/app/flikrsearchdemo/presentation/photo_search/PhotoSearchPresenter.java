@@ -10,10 +10,13 @@ import com.app.flikrsearchdemo.data.repository.search_terms.SearchTermRepository
 import com.app.flikrsearchdemo.executors.AppTaskExecutor;
 import com.app.flikrsearchdemo.presentation.adapter.photos.PhotoConnector;
 import com.app.flikrsearchdemo.presentation.adapter.photos.PhotoRow;
+import com.app.flikrsearchdemo.presentation.adapter.search_term.SearchTermConnector;
+import com.app.flikrsearchdemo.presentation.adapter.search_term.SearchTermRow;
 
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -28,7 +31,7 @@ import io.reactivex.disposables.Disposable;
  */
 @Singleton
 public class PhotoSearchPresenter implements SearchScreenContract.UserActionListener,
-        PhotoConnector {
+        PhotoConnector, SearchTermConnector {
 
     private SearchScreenContract.View view;
     private PhotoSearchRepository photoSearchRepository;
@@ -37,7 +40,9 @@ public class PhotoSearchPresenter implements SearchScreenContract.UserActionList
     private AppTaskExecutor postTaskExecutor;
 
     private int currentPage = 1;
+    private String currentTag = "";
     private List<SearchPhoto> photoSearchResults = new ArrayList<>();
+    private LinkedList<String> searchTerms = new LinkedList<>();
 
     @Inject
     PhotoSearchPresenter(PhotoSearchRepository photoSearchRepository,
@@ -57,19 +62,74 @@ public class PhotoSearchPresenter implements SearchScreenContract.UserActionList
     }
 
     @Override
-    public void getSearchTerms() {
-        view.showSearchTags(searchTermRepository.getSearchTerms());
+    public void bind(@NotNull SearchTermRow searchTermRow, int position) {
+        String currentSearchTerm = searchTerms.get(position);
+        searchTermRow.setSearchText(currentSearchTerm);
+        searchTermRow.setPosition(position);
     }
 
     @Override
-    public void searchForPhotos(String tags) {
-        view.showLoading();
+    public int getCount() {
+        return searchTerms.size();
+    }
+
+    @Override
+    public void onSelectSearchTerm(int position) {
+        onNewPhotoSearch(searchTerms.get(position));
+    }
+
+    @Override
+    public void getSearchTerms() {
+
+        searchTerms.clear();
+        searchTerms.addAll(searchTermRepository.getSearchTerms());
+    }
+
+    private void resetSearch() {
+        currentPage = 1;
+        photoSearchResults.clear();
+        view.updatePhotoList();
+    }
+
+    @Override
+    public void onNewPhotoSearch(String tags) {
+
+        resetSearch();
+
+        if(!searchTerms.contains(tags)) {
+            searchTerms.addFirst(tags);
+            searchTermRepository.addNewSearchTerm(tags);
+        } else {
+            searchTerms.remove(tags);
+            searchTerms.addFirst(tags);
+        }
+
+        view.updateSearchTerms();
 
         System.out.println("Searching for photos with tags "+ tags);
 
-        searchTermRepository.addNewSearchTerm(tags);
+        currentTag = tags;
+        searchForPhotos(currentTag);
+    }
 
-        photoSearchRepository.queryImage(currentPage, 25, tags)
+    @Override
+    public void refreshPhotoList() {
+        resetSearch();
+        searchForPhotos(currentTag);
+    }
+
+    @Override
+    public void loadMorePhotos() {
+        currentPage += 1;
+        searchForPhotos(currentTag);
+    }
+
+
+    private void searchForPhotos(String tags) {
+
+        view.showLoading();
+
+        photoSearchRepository.queryImage(currentPage, tags)
                 .subscribeOn(backgroundExecutor.getScheduler())
                 .observeOn(postTaskExecutor.getScheduler())
                 .subscribe(new PhotoRequestObserver());
