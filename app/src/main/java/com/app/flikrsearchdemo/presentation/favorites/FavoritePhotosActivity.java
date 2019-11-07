@@ -1,5 +1,6 @@
 package com.app.flikrsearchdemo.presentation.favorites;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
@@ -10,12 +11,11 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.app.flikrsearchdemo.R;
+import com.app.flikrsearchdemo.presentation.PhotoDetailActivity;
 import com.app.flikrsearchdemo.presentation.adapter.favorites.FavoritePhotoListAdapter;
-import com.app.flikrsearchdemo.presentation.adapter.photos.PhotoListAdapter;
-import com.app.flikrsearchdemo.presentation.adapter.search_term.SearchTermAdapter;
+
 
 import javax.inject.Inject;
 
@@ -73,5 +73,22 @@ public class FavoritePhotosActivity extends DaggerAppCompatActivity
     @Override
     public void showError(String localizedMessage) {
         Toast.makeText(this, localizedMessage, Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void showSelectedPhoto(String photoTitle, String photoUrl) {
+        Bundle detailBundle = new Bundle();
+        detailBundle.putString("title", photoTitle);
+        detailBundle.putString("image_url", photoUrl);
+        detailBundle.putBoolean("from_search", true);
+
+        Intent detailIntent = new Intent(this, PhotoDetailActivity.class);
+        detailIntent.putExtras(detailBundle);
+        startActivity(detailIntent);
+    }
+
+    @Override
+    public void updatePhotoDeletedAt(int position) {
+        photoListAdapter.notifyItemRemoved(position);
     }
 }

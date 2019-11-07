@@ -37,7 +37,7 @@ public interface SearchScreenContract {
          */
         void showLoading();
 
-        void showSelected(String photoTitle, String photoUrl);
+        void showSelectedPhoto(String photoTitle, String photoUrl);
         void updateSearchTerms();
 
         void showBookmarkSuccess(String message);

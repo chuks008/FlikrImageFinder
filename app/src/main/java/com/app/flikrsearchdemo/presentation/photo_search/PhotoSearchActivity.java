@@ -151,7 +151,7 @@ public class PhotoSearchActivity extends DaggerAppCompatActivity implements Sear
     }
 
     @Override
-    public void showSelected(String photoTitle, String photoUrl) {
+    public void showSelectedPhoto(String photoTitle, String photoUrl) {
         Bundle detailBundle = new Bundle();
         detailBundle.putString("title", photoTitle);
         detailBundle.putString("image_url", photoUrl);

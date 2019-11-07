@@ -20,6 +20,6 @@ interface FavoritePhotoDao {
     fun addFavoritePhoto(favoritePhoto: FavoritePhoto): Completable
 
     @Delete
-    fun deleteFavoritePhoto(favoritePhoto: FavoritePhoto)
+    fun deleteFavoritePhoto(favoritePhoto: FavoritePhoto): Completable
 
 }

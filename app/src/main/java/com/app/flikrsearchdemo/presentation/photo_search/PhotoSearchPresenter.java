@@ -1,9 +1,6 @@
 package com.app.flikrsearchdemo.presentation.photo_search;
 
-import android.graphics.Bitmap;
-
 import com.app.flikrsearchdemo.Constants;
-import com.app.flikrsearchdemo.data.file_management.FileSaverMgr;
 import com.app.flikrsearchdemo.data.file_management.OnImageDownloadComplete;
 import com.app.flikrsearchdemo.data.repository.favorites.FavoritePhotoRepository;
 import com.app.flikrsearchdemo.data.repository.photos_search.PhotoSearchRepository;
@@ -11,7 +8,6 @@ import com.app.flikrsearchdemo.data.repository.photos_search.SearchPhoto;
 import com.app.flikrsearchdemo.data.repository.photos_search.response.ResultPhoto;
 import com.app.flikrsearchdemo.data.repository.photos_search.response.SearchResultResponse;
 import com.app.flikrsearchdemo.data.repository.search_terms.SearchTermRepository;
-import com.app.flikrsearchdemo.data.repository.search_terms.SearchTermRepositoryImpl;
 import com.app.flikrsearchdemo.executors.AppTaskExecutor;
 import com.app.flikrsearchdemo.presentation.adapter.photos.PhotoConnector;
 import com.app.flikrsearchdemo.presentation.adapter.photos.PhotoRow;
@@ -26,7 +22,6 @@ import java.util.List;
 
 import javax.inject.Inject;
 import javax.inject.Named;
-import javax.inject.Singleton;
 
 import io.reactivex.Completable;
 import io.reactivex.CompletableObserver;
@@ -222,7 +217,7 @@ public class PhotoSearchPresenter implements SearchScreenContract.UserActionList
     public void onSelectItem(int position) {
         SearchPhoto photo = photoSearchResults.get(position);
 
-        view.showSelected(photo.getPhotoTitle(),
+        view.showSelectedPhoto(photo.getPhotoTitle(),
                 generateImageUrl(photo));
     }
 

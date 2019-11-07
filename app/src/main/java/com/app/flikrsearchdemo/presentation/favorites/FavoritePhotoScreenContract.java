@@ -8,6 +8,9 @@ public interface FavoritePhotoScreenContract {
     interface View {
         void updateFavoriteList();
         void showError(String localizedMessage);
+        void showSelectedPhoto(String photoTitle, String photoUrl);
+
+        void updatePhotoDeletedAt(int position);
     }
 
     interface UserActionListener {

@@ -12,6 +12,5 @@ interface FavoritePhotoRepository {
 
     fun getPhotos(): Single<List<FavoritePhoto>>
     fun addPhoto(photoTitle: String, photoUrl: String, onComplete: OnImageDownloadComplete)
-    fun removePhoto(id: Int)
-    fun removePhotoByTitle(photoTitle: String)
+    fun removePhoto(toRemove: FavoritePhoto): Completable
 }

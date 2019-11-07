@@ -17,6 +17,7 @@ import java.util.List;
 import javax.inject.Inject;
 import javax.inject.Named;
 
+import io.reactivex.CompletableObserver;
 import io.reactivex.SingleObserver;
 import io.reactivex.disposables.Disposable;
 
@@ -94,11 +95,31 @@ public class FavoritePhotoPresenter implements FavoritePhotoScreenContract.UserA
 
     @Override
     public void onSelectItem(int position) {
-
+        FavoritePhoto selectedPhoto = favoritePhotos.get(position);
+        view.showSelectedPhoto(selectedPhoto.getPhotoTitle(), selectedPhoto.getPhotoLocation());
     }
 
     @Override
-    public void onActionPerformed(int position) {
+    public void onActionPerformed(final int position) {
+        favoritePhotoRepository.removePhoto(favoritePhotos.get(position))
+                .subscribeOn(backgroundExecutor.getScheduler())
+                .observeOn(postTaskExecutor.getScheduler())
+                .subscribe(new CompletableObserver() {
+                    @Override
+                    public void onSubscribe(Disposable d) {
 
+                    }
+
+                    @Override
+                    public void onComplete() {
+                        favoritePhotos.remove(position);
+                        view.updatePhotoDeletedAt(position);
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        view.showError(e.getLocalizedMessage());
+                    }
+                });
     }
 }

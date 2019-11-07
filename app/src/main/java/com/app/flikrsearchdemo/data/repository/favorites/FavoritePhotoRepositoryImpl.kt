@@ -10,6 +10,7 @@ import com.app.flikrsearchdemo.data.file_management.FileSaverMgr
 import com.app.flikrsearchdemo.data.file_management.OnImageDownloadComplete
 import com.app.flikrsearchdemo.executors.BackgroundExecutor
 import com.app.flikrsearchdemo.executors.PostTaskExecutor
+import io.reactivex.Completable
 import io.reactivex.Single
 import io.reactivex.SingleObserver
 import io.reactivex.disposables.Disposable
@@ -69,12 +70,8 @@ class FavoritePhotoRepositoryImpl @Inject constructor (private val db: FlikrDemo
             })
     }
 
-    override fun removePhoto(id: Int) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
-
-    override fun removePhotoByTitle(photoTitle: String) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    override fun removePhoto(favoritePhoto: FavoritePhoto): Completable {
+        return db.favoritePhotoDao().deleteFavoritePhoto(favoritePhoto)
     }
 
 
