@@ -14,7 +14,7 @@ import javax.inject.Singleton
  * Created by Your name on 2019-11-05.
  */
 
-@Database(entities = [FavoritePhoto::class], version = 1)
+@Database(entities = [FavoritePhoto::class], version = 1, exportSchema = false)
 abstract class FlikrDemoDB: RoomDatabase() {
 
     abstract fun favoritePhotoDao(): FavoritePhotoDao

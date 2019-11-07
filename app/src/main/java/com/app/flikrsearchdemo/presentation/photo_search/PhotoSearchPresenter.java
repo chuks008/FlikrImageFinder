@@ -227,7 +227,7 @@ public class PhotoSearchPresenter implements SearchScreenContract.UserActionList
     }
 
     @Override
-    public void onBookmarkPhoto(int position) {
+    public void onActionPerformed(int position) {
 
         currentPhotoPosition = position;
         view.checkPermissions();
@@ -314,12 +314,6 @@ public class PhotoSearchPresenter implements SearchScreenContract.UserActionList
             }
 
             view.showError(searchResultResponse.getErrorMessage());
-
-//            if(photoSearchResults.size() < 1) {
-//                view.showErrorWithNoInitialResult();
-//            } else {
-//                view.showError(searchResultResponse.getErrorMessage());
-//            }
         }
 
         @Override

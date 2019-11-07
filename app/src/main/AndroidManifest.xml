@@ -26,6 +26,7 @@
         </activity>
 
         <activity android:name=".presentation.PhotoDetailActivity" />
+        <activity android:name=".presentation.favorites.FavoritePhotosActivity" />
     </application>
 
 </manifest>

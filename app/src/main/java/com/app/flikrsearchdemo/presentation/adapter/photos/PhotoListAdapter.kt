@@ -6,11 +6,9 @@ import android.content.DialogInterface
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageButton
-import android.widget.ImageView
-import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.app.flikrsearchdemo.R
+import com.app.flikrsearchdemo.presentation.adapter.BasePhotoViewHolder
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
 
@@ -34,26 +32,17 @@ class PhotoListAdapter(private val photoConnector: PhotoConnector):
     }
 
     class PhotoListViewHolder(itemView: View, photoConnector: PhotoConnector, context: Context):
-        RecyclerView.ViewHolder(itemView), PhotoRow {
-
-        private val imageTitle: TextView = itemView.findViewById(R.id.imageTitleText)
-        private val photoImage: ImageView = itemView.findViewById(R.id.photoImageView)
-        private val photoLikeBtn: ImageButton = itemView.findViewById(R.id.bookmarkImageBtn)
-        private var currentPosition: Int = 0
+        BasePhotoViewHolder(itemView, photoConnector, context) {
 
         init {
-            itemView.setOnClickListener {
-                photoConnector.onSelectItem(currentPosition)
-            }
-
-            photoLikeBtn.setOnClickListener {
+            photoActionBtn.setOnClickListener {
                 AlertDialog.Builder(context).run {
                     setTitle("Adding photo to favorites")
                     setMessage("Would you like to add this photo to your favorites?")
                     setPositiveButton("yes", DialogInterface.OnClickListener {
                             dialogInterface, i ->
 
-                        photoConnector.onBookmarkPhoto(currentPosition)
+                        photoConnector.onActionPerformed(currentPosition)
                         dialogInterface.dismiss()
                     })
 
@@ -64,24 +53,8 @@ class PhotoListAdapter(private val photoConnector: PhotoConnector):
 
                     show()
                 }
-
             }
         }
-
-        override fun setTitle(title: String) {
-            imageTitle.text = title
-        }
-
-        override fun setImage(imageUrl: String) {
-            Glide.with(photoImage.context)
-                .load(imageUrl)
-                .apply(RequestOptions().placeholder(R.drawable.placeholder_img))
-                .centerCrop()
-                .into(photoImage)
-        }
-
-        override fun setPosition(position: Int) {
-            currentPosition = position
-        }
     }
+
 }

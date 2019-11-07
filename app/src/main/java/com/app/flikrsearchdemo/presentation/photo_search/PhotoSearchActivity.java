@@ -24,6 +24,7 @@ import com.app.flikrsearchdemo.R;
 import com.app.flikrsearchdemo.presentation.PhotoDetailActivity;
 import com.app.flikrsearchdemo.presentation.adapter.photos.PhotoListAdapter;
 import com.app.flikrsearchdemo.presentation.adapter.search_term.SearchTermAdapter;
+import com.app.flikrsearchdemo.presentation.favorites.FavoritePhotosActivity;
 
 import javax.inject.Inject;
 
@@ -112,6 +113,7 @@ public class PhotoSearchActivity extends DaggerAppCompatActivity implements Sear
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_favorites:
+                startActivity(new Intent(this, FavoritePhotosActivity.class));
                 break;
         }
         return super.onOptionsItemSelected(item);
