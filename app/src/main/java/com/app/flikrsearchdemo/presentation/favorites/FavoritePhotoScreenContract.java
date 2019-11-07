@@ -10,7 +10,7 @@ public interface FavoritePhotoScreenContract {
         void showError(String localizedMessage);
         void showSelectedPhoto(String photoTitle, String photoUrl);
 
-        void updatePhotoDeletedAt(int position);
+        void updatePhotoDeletedAt(int position, int listSize);
     }
 
     interface UserActionListener {

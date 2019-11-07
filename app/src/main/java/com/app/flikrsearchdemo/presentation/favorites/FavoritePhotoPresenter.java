@@ -113,7 +113,7 @@ public class FavoritePhotoPresenter implements FavoritePhotoScreenContract.UserA
                     @Override
                     public void onComplete() {
                         favoritePhotos.remove(position);
-                        view.updatePhotoDeletedAt(position);
+                        view.updatePhotoDeletedAt(position, favoritePhotos.size());
                     }
 
                     @Override

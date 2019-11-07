@@ -4,7 +4,8 @@
     android:layout_height="40dp"
     android:layout_marginStart="10dp"
     android:layout_marginEnd="5dp"
-    android:background="#34C4C4C4">
+    android:background="#34C4C4C4"
+    android:foreground="@drawable/ripple">
 
     <ImageView
         android:id="@+id/timeIcon"

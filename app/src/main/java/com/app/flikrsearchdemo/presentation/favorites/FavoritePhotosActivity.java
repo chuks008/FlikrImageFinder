@@ -91,7 +91,8 @@ public class FavoritePhotosActivity extends DaggerAppCompatActivity
     }
 
     @Override
-    public void updatePhotoDeletedAt(int position) {
+    public void updatePhotoDeletedAt(int position, int listSize) {
         photoListAdapter.notifyItemRemoved(position);
+        photoListAdapter.notifyItemRangeChanged(position, listSize);
     }
 }
