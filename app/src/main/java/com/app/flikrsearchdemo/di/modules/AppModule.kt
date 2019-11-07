@@ -5,8 +5,8 @@ import android.content.Context
 import android.content.SharedPreferences
 import com.app.flikrsearchdemo.Constants
 import com.app.flikrsearchdemo.data.db.FlikrDemoDB
-import com.app.flikrsearchdemo.data.file_management.FileSaverMgr
-import com.app.flikrsearchdemo.data.file_management.FileSaverMgrImpl
+import com.app.flikrsearchdemo.data.file_management.ImageFileMgr
+import com.app.flikrsearchdemo.data.file_management.ImageFileMgrImpl
 import com.app.flikrsearchdemo.data.repository.favorites.FavoritePhotoRepository
 import com.app.flikrsearchdemo.data.repository.favorites.FavoritePhotoRepositoryImpl
 import com.app.flikrsearchdemo.data.repository.photos_search.PhotoSearchRepository
@@ -64,8 +64,8 @@ class AppModule {
     }
 
     @Provides
-    fun providesFileSaverMgr(fileSaverMgr: FileSaverMgrImpl): FileSaverMgr {
-        return fileSaverMgr
+    fun providesFileSaverMgr(imageFileMgr: ImageFileMgrImpl): ImageFileMgr {
+        return imageFileMgr
     }
 
     @Provides

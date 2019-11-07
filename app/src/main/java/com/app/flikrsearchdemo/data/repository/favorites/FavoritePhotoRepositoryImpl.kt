@@ -2,11 +2,14 @@ package com.app.flikrsearchdemo.data.repository.favorites
 
 import android.app.Application
 import android.graphics.Bitmap
+import android.net.Uri
 import android.provider.MediaStore
 import android.util.Log
+import androidx.core.net.toFile
+import androidx.documentfile.provider.DocumentFile
 import com.app.flikrsearchdemo.data.db.FlikrDemoDB
 import com.app.flikrsearchdemo.data.db.favorites.FavoritePhoto
-import com.app.flikrsearchdemo.data.file_management.FileSaverMgr
+import com.app.flikrsearchdemo.data.file_management.ImageFileMgr
 import com.app.flikrsearchdemo.data.file_management.OnImageDownloadComplete
 import com.app.flikrsearchdemo.executors.BackgroundExecutor
 import com.app.flikrsearchdemo.executors.PostTaskExecutor
@@ -14,7 +17,10 @@ import io.reactivex.Completable
 import io.reactivex.Single
 import io.reactivex.SingleObserver
 import io.reactivex.disposables.Disposable
+import java.io.File
+import java.io.FileNotFoundException
 import java.lang.Exception
+import java.net.URI
 import javax.inject.Inject
 
 /**
@@ -24,7 +30,7 @@ class FavoritePhotoRepositoryImpl @Inject constructor (private val db: FlikrDemo
                                                        private val context: Application,
                                                        private val backgroundExecutor: BackgroundExecutor,
                                                        private val postTaskExecutor: PostTaskExecutor,
-                                                       private val fileSaverMgr: FileSaverMgr):
+                                                       private val imageFileMgr: ImageFileMgr):
     FavoritePhotoRepository {
 
     private val TAG = FavoritePhotoRepository::class.java.simpleName
@@ -38,7 +44,7 @@ class FavoritePhotoRepositoryImpl @Inject constructor (private val db: FlikrDemo
                           onComplete: OnImageDownloadComplete) {
         // save to local storage using file saver manager
 
-        fileSaverMgr.downloadImage(photoUrl)
+        imageFileMgr.downloadImage(photoUrl)
             .subscribeOn(backgroundExecutor.scheduler)
             .observeOn(postTaskExecutor.scheduler)
             .subscribe(object : SingleObserver<Bitmap> {
@@ -70,8 +76,27 @@ class FavoritePhotoRepositoryImpl @Inject constructor (private val db: FlikrDemo
             })
     }
 
-    override fun removePhoto(favoritePhoto: FavoritePhoto): Completable {
-        return db.favoritePhotoDao().deleteFavoritePhoto(favoritePhoto)
+    override fun removePhoto(toRemove: FavoritePhoto): Completable {
+
+        try {
+            Log.e(TAG, "Image location: ${toRemove.photoLocation}")
+            Log.e(TAG, "Actual image location: ${Uri.parse(toRemove.photoLocation).path}")
+//           DocumentFile.fromSingleUri(context, Uri.parse(toRemove.photoLocation))?.delete()
+            val convertedToFileString = imageFileMgr.getRealPathFromUri(context, Uri.parse(toRemove.photoLocation))
+            val file = File(convertedToFileString)
+            if(file.exists()) {
+                file.delete()
+                Log.e(TAG, "File deleted")
+            } else {
+                Log.e(TAG, "Could not delete file")
+            }
+
+        } catch (e: Exception) {
+            e.printStackTrace()
+            return Completable.error(e)
+        }
+
+        return db.favoritePhotoDao().deleteFavoritePhoto(toRemove)
     }
 
 
