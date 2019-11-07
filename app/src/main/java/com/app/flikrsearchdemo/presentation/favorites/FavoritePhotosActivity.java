@@ -9,11 +9,13 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.Toolbar;
+import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.app.flikrsearchdemo.R;
 import com.app.flikrsearchdemo.presentation.PhotoDetailActivity;
+import com.app.flikrsearchdemo.presentation.adapter.CustomItemDecoration;
 import com.app.flikrsearchdemo.presentation.adapter.favorites.FavoritePhotoListAdapter;
 
 
@@ -48,7 +50,8 @@ public class FavoritePhotosActivity extends DaggerAppCompatActivity
 
         photoRecyclerView = findViewById(R.id.photoRecyclerView);
         photoListAdapter = new FavoritePhotoListAdapter(presenter);
-        photoRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+        photoRecyclerView.setLayoutManager(new GridLayoutManager(this, 2));
+        photoRecyclerView.addItemDecoration(new CustomItemDecoration(5, 3));
         photoRecyclerView.setAdapter(photoListAdapter);
 
         findViewById(R.id.pastTermsRecyclerView).setVisibility(View.GONE);

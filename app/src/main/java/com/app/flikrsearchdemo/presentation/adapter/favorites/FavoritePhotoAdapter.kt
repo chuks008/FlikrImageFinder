@@ -17,7 +17,7 @@ class FavoritePhotoListAdapter(private val photoConnector: PhotoConnector):
     RecyclerView.Adapter<FavoritePhotoListAdapter.FavoritePhotoViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): FavoritePhotoViewHolder {
-        val itemView = LayoutInflater.from(parent.context).inflate(R.layout.search_gallery_item, parent, false)
+        val itemView = LayoutInflater.from(parent.context).inflate(R.layout.favorite_gallery_item, parent, false)
         return FavoritePhotoViewHolder(itemView, photoConnector, parent.context)
     }
 
@@ -33,9 +33,6 @@ class FavoritePhotoListAdapter(private val photoConnector: PhotoConnector):
         BasePhotoViewHolder(itemView, photoConnector, context) {
 
         init {
-
-            photoActionBtn
-                .setImageDrawable(context.resources.getDrawable(R.drawable.ic_delete_forever_black_24dp))
 
             photoActionBtn.setOnClickListener {
                 AlertDialog.Builder(context).run {
