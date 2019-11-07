@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -41,23 +42,33 @@ public class FavoritePhotosActivity extends DaggerAppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.photo_list_layout);
 
+        setupToolbar();
+        setupFavoritesPhotoList();
+        hideUnusedViews();
+
+        presenter.setView(this);
+        presenter.getFavoritePhotos();
+
+    }
+
+    private void setupFavoritesPhotoList() {
+        photoRecyclerView = findViewById(R.id.photoRecyclerView);
+        photoListAdapter = new FavoritePhotoListAdapter(presenter);
+        photoRecyclerView.setLayoutManager(new GridLayoutManager(this, 2));
+        photoRecyclerView.setAdapter(photoListAdapter);
+    }
+
+    private void setupToolbar() {
         toolbar = findViewById(R.id.mainScreenToolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setTitle("Favorites");
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+    }
 
-        presenter.setView(this);
-
-        photoRecyclerView = findViewById(R.id.photoRecyclerView);
-        photoListAdapter = new FavoritePhotoListAdapter(presenter);
-        photoRecyclerView.setLayoutManager(new GridLayoutManager(this, 2));
-        photoRecyclerView.addItemDecoration(new CustomItemDecoration(5, 3));
-        photoRecyclerView.setAdapter(photoListAdapter);
-
+    private void hideUnusedViews() {
         findViewById(R.id.pastTermsRecyclerView).setVisibility(View.GONE);
         findViewById(R.id.swipeRefresher).setEnabled(false);
-        presenter.getFavoritePhotos();
-
+        findViewById(R.id.statusMessageLayout).setVisibility(View.GONE);
     }
 
     @Override

@@ -35,17 +35,15 @@ class SearchTermRepositoryImpl @Inject constructor(private val sharedPreferences
             if(searchTerms.size == 30) {
                 searchTerms.pollLast()
             }
-
-            searchTerms.addFirst(searchTerm)
         }
-    }
 
-    override fun saveSearchTerms() {
+        searchTerms.addFirst(searchTerm)
 
         Log.e(TAG, "Saving terms to shared pref: Total = ${searchTerms.size}")
         sharedPreferences.edit().run {
             putString("search_term_string", gson.toJson(searchTerms))
             apply()
         }
+
     }
 }

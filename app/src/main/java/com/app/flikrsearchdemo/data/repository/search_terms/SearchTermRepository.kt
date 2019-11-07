@@ -4,5 +4,4 @@ interface SearchTermRepository {
 
     fun getSearchTerms(): List<String>
     fun addNewSearchTerm(searchTerm: String)
-    fun saveSearchTerms()
 }

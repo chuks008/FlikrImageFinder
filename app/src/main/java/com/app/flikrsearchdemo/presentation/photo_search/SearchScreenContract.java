@@ -1,9 +1,5 @@
 package com.app.flikrsearchdemo.presentation.photo_search;
 
-import com.app.flikrsearchdemo.data.repository.photos_search.SearchPhoto;
-
-import java.util.List;
-
 /**
  * Created by Your name on 2019-11-05.
  */
@@ -16,11 +12,6 @@ public interface SearchScreenContract {
          * @param errorMessage: error message
          */
         void showError(String errorMessage);
-
-        /**
-         * Show an error when there is currently no data stored in the presenter
-         */
-        void showErrorWithNoInitialResult();
 
         /**
          * Update the state of photo items on the view
@@ -50,6 +41,13 @@ public interface SearchScreenContract {
          * @param pageSize
          */
         void onFirstPhotoResultLoad(int pageSize);
+
+        /**
+         * Show an error when no results are found either due to a network or keyword error
+         *
+         * @param errorMessage
+         */
+        void showStatusMessageError(String errorMessage);
     }
 
     interface UserActionListener {
@@ -58,15 +56,37 @@ public interface SearchScreenContract {
          * Search the presenter's data source for pictures using the tags set
          *
          */
-
         void onNewPhotoSearch(String tags);
+
+        /**
+         * Load more photos from the network
+         */
         void loadMorePhotos();
 
+        /**
+         * Get all the past keywords searched by the user
+         */
         void getSearchTerms();
-        void saveSearchTerms();
+
+        /**
+         * Reset the photo query search parameters to their initial state
+         */
         void refreshPhotoList();
+
+        /**
+         * Save the current photo chosen by the user to the device
+         */
         void saveCurrentPhoto();
 
+        /**
+         * Remove the reference to the view in the presenter
+         */
+        void dispose();
+
+        /**
+         * Returns if the current page in the search query is the last page to fetch
+         * @return
+         */
         boolean isLastPage();
     }
 }

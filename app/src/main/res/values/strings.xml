@@ -1,4 +1,5 @@
 <resources>
     <string name="app_name">Flikr Search Demo</string>
     <string name="search_hint">Search photos here...</string>
+    <string name="search_for_images_status_hint">Search for images</string>
 </resources>

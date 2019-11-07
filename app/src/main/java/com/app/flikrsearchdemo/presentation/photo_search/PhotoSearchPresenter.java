@@ -40,6 +40,8 @@ public class PhotoSearchPresenter implements SearchScreenContract.UserActionList
     private AppTaskExecutor backgroundExecutor;
     private AppTaskExecutor postTaskExecutor;
     private FavoritePhotoRepository favoritePhotoRepository;
+    private final String NETWORK_ERROR = "Error during search. Check your internet connection";
+    private final String NO_RESULTS_FOUND = "No results found";
 
     private String currentTag = "";
     private int currentPhotoPosition = 0;
@@ -89,27 +91,16 @@ public class PhotoSearchPresenter implements SearchScreenContract.UserActionList
         searchTermRow.setPosition(position);
     }
 
-    /**
-     *
-     * @return
-     */
     @Override
     public int getCount() {
         return searchTerms.size();
     }
 
-    /**
-     *
-     * @param position
-     */
     @Override
     public void onSelectSearchTerm(int position) {
         onNewPhotoSearch(searchTerms.get(position));
     }
 
-    /**
-     *
-     */
     @Override
     public void getSearchTerms() {
 
@@ -117,19 +108,12 @@ public class PhotoSearchPresenter implements SearchScreenContract.UserActionList
         searchTerms.addAll(searchTermRepository.getSearchTerms());
     }
 
-    /**
-     *
-     */
     private void resetSearch() {
         currentPage = 1;
         photoSearchResults.clear();
         view.updatePhotoList();
     }
 
-    /**
-     *
-     * @param tags
-     */
     @Override
     public void onNewPhotoSearch(String tags) {
 
@@ -151,28 +135,17 @@ public class PhotoSearchPresenter implements SearchScreenContract.UserActionList
         searchForPhotos(currentTag);
     }
 
-    /**
-     *
-     */
     @Override
     public void refreshPhotoList() {
         resetSearch();
         searchForPhotos(currentTag);
     }
 
-    /**
-     *
-     */
     @Override
     public void loadMorePhotos() {
-        currentPage += 1;
         searchForPhotos(currentTag);
     }
 
-    /**
-     *
-     * @param tags
-     */
     private void searchForPhotos(String tags) {
 
         view.showLoading();
@@ -183,12 +156,6 @@ public class PhotoSearchPresenter implements SearchScreenContract.UserActionList
                 .subscribe(new PhotoRequestObserver());
     }
 
-    /**
-     *
-     *
-     * @param photo
-     * @param position
-     */
     @Override
     public void bind(@NotNull PhotoRow photo, int position) {
         SearchPhoto currentItem = photoSearchResults.get(position);
@@ -197,11 +164,6 @@ public class PhotoSearchPresenter implements SearchScreenContract.UserActionList
         photo.setImage(generateImageUrl(currentItem));
     }
 
-    /**
-     *
-     * @param photo
-     * @return
-     */
     private String generateImageUrl(SearchPhoto photo) {
         return String.format(Constants.IMAGE_LOAD_URL,
                 photo.getFarmId(),
@@ -210,19 +172,11 @@ public class PhotoSearchPresenter implements SearchScreenContract.UserActionList
                 photo.getSecret());
     }
 
-    /**
-     *
-     * @return
-     */
     @Override
     public int getItemCount() {
         return photoSearchResults.size();
     }
 
-    /**
-     *
-     * @param position
-     */
     @Override
     public void onSelectItem(int position) {
         SearchPhoto photo = photoSearchResults.get(position);
@@ -249,6 +203,14 @@ public class PhotoSearchPresenter implements SearchScreenContract.UserActionList
                 this);
     }
 
+    /**
+     * Save an image reference to the photo repository when it has completed saving to the local
+     * storage
+     *
+     * @param error
+     * @param message
+     * @param savePhotoToDBTask
+     */
     @Override
     public void onCompleteImageSave(boolean error, final @NotNull String message, Completable savePhotoToDBTask) {
 
@@ -278,6 +240,9 @@ public class PhotoSearchPresenter implements SearchScreenContract.UserActionList
 
     }
 
+    /**
+     * An observer used to request for images from the network
+     */
     private final class PhotoRequestObserver implements SingleObserver<SearchResultResponse> {
 
         /**
@@ -314,6 +279,11 @@ public class PhotoSearchPresenter implements SearchScreenContract.UserActionList
 
                 System.out.println("Total results: "+ photoSearchResults.size());
 
+                if(photoSearchResults.size() < 1) {
+                    view.showStatusMessageError(NO_RESULTS_FOUND);
+                    return;
+                }
+
                 if(isFirstLoad) {
                     totalPages = searchResultResponse
                             .getPhotoResult()
@@ -325,23 +295,41 @@ public class PhotoSearchPresenter implements SearchScreenContract.UserActionList
                 } else {
                     view.updatePhotoList();
                 }
+                System.out.println("Current page queried: "+ currentPage);
+                currentPage += 1;
 
                 return;
             }
 
-            view.showError(searchResultResponse.getErrorMessage());
+            if(photoSearchResults.size() < 1) {
+                view.showStatusMessageError(NETWORK_ERROR);
+            } else {
+                view.showError(searchResultResponse.getErrorMessage());
+            }
+
+            System.out.println("Current page queried: "+ currentPage);
+
         }
 
         @Override
         public void onError(Throwable e) {
             view.hideLoading();
-            view.showError(e.getLocalizedMessage());
+
+            if(photoSearchResults.size() < 1) {
+                view.showStatusMessageError(NETWORK_ERROR);
+            } else {
+                view.showError(e.getLocalizedMessage());
+            }
+
+            System.out.println("Current page queried: "+ currentPage);
+
         }
     }
 
     @Override
-    public void saveSearchTerms() {
+    public void dispose() {
         this.view = null;
-        searchTermRepository.saveSearchTerms();
     }
+
+
 }

@@ -8,6 +8,10 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -46,6 +50,8 @@ public class PhotoSearchActivity extends DaggerAppCompatActivity implements Sear
     private RecyclerView searchTermRecyclerView;
     private static final int WRITE_STORAGE_REQUEST = 101;
     private boolean photoLoadingStatus = false;
+    private LinearLayout statusMessageLayout;
+    private TextView statusMessage;
 
     @Inject
     PhotoSearchPresenter presenter;
@@ -56,27 +62,20 @@ public class PhotoSearchActivity extends DaggerAppCompatActivity implements Sear
 
         setContentView(R.layout.photo_list_layout);
 
-        Toolbar toolbar = findViewById(R.id.mainScreenToolbar);
-        setSupportActionBar(toolbar);
-        getSupportActionBar().setTitle(getResources().getString(R.string.app_name));
-
-        presenter.setView(this);
-
-        photoRecyclerView = findViewById(R.id.photoRecyclerView);
-        photoListAdapter = new PhotoListAdapter(presenter);
-        layoutManager = new LinearLayoutManager(this);
-        photoRecyclerView.setLayoutManager(layoutManager);
-        photoRecyclerView.setAdapter(photoListAdapter);
-
-        searchTermRecyclerView = findViewById(R.id.pastTermsRecyclerView);
-        searchTermAdapter = new SearchTermAdapter(presenter);
-        searchTermRecyclerView.setLayoutManager(new LinearLayoutManager(this,
-                RecyclerView.HORIZONTAL,
-                false));
-        searchTermRecyclerView.setAdapter(searchTermAdapter);
+        setupToolbar();
+        setupPhotoResultList();
+        setupSearchTermsResultList();
+        setupPhotoListSwipeRefresh();
+        setupSearchStatusLayout();
 
         presenter.getSearchTerms();
+        presenter.setView(this);
 
+        Log.e(TAG, "Starting search activities");
+    }
+
+
+    private void setupPhotoListSwipeRefresh() {
         swipeRefreshLayout = findViewById(R.id.swipeRefresher);
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
@@ -84,9 +83,35 @@ public class PhotoSearchActivity extends DaggerAppCompatActivity implements Sear
                 presenter.refreshPhotoList();
             }
         });
-        Log.e(TAG, "Starting search activities");
     }
 
+    private void setupSearchStatusLayout() {
+        statusMessageLayout = findViewById(R.id.statusMessageLayout);
+        statusMessage = statusMessageLayout.findViewById(R.id.statusMessageText);
+    }
+
+    private void setupSearchTermsResultList() {
+        searchTermRecyclerView = findViewById(R.id.pastTermsRecyclerView);
+        searchTermAdapter = new SearchTermAdapter(presenter);
+        searchTermRecyclerView.setLayoutManager(new LinearLayoutManager(this,
+                RecyclerView.HORIZONTAL,
+                false));
+        searchTermRecyclerView.setAdapter(searchTermAdapter);
+    }
+
+    private void setupPhotoResultList() {
+        photoRecyclerView = findViewById(R.id.photoRecyclerView);
+        photoListAdapter = new PhotoListAdapter(presenter);
+        layoutManager = new LinearLayoutManager(this);
+        photoRecyclerView.setLayoutManager(layoutManager);
+        photoRecyclerView.setAdapter(photoListAdapter);
+    }
+
+    private void setupToolbar() {
+        Toolbar toolbar = findViewById(R.id.mainScreenToolbar);
+        setSupportActionBar(toolbar);
+        getSupportActionBar().setTitle(getResources().getString(R.string.app_name));
+    }
 
 
     @Override
@@ -124,17 +149,22 @@ public class PhotoSearchActivity extends DaggerAppCompatActivity implements Sear
 
     @Override
     public void showError(String errorMessage) {
-        Log.e(TAG, errorMessage);
+        Toast.makeText(this, errorMessage, Toast.LENGTH_SHORT).show();
     }
 
     @Override
-    public void showErrorWithNoInitialResult() {
-        Log.e(TAG, "Error getting photo results");
+    public void showStatusMessageError(String errorMessage) {
+        if(statusMessageLayout.getVisibility() == View.GONE) {
+            statusMessageLayout.setVisibility(View.VISIBLE);
+        }
+        statusMessage.setText(errorMessage);
     }
 
     @Override
     public void updatePhotoList() {
-
+        if(statusMessageLayout.getVisibility() == View.VISIBLE) {
+            statusMessageLayout.setVisibility(View.GONE);
+        }
         photoListAdapter.notifyDataSetChanged();
     }
 
@@ -224,18 +254,14 @@ public class PhotoSearchActivity extends DaggerAppCompatActivity implements Sear
     @Override
     public void onRequestPermissionsResult(int requestCode,
                                            String[] permissions, int[] grantResults) {
-        switch (requestCode) {
-            case WRITE_STORAGE_REQUEST: {
-                // If request is cancelled, the result arrays are empty.
-                if (grantResults.length > 0
-                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    presenter.saveCurrentPhoto();
-                } else {
-                    Toast.makeText(this,
-                            "Please grant write storage access to save photos",
-                            Toast.LENGTH_LONG).show();
-                }
-                return;
+        if (requestCode == WRITE_STORAGE_REQUEST) {
+            if (grantResults.length > 0
+                    && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                presenter.saveCurrentPhoto();
+            } else {
+                Toast.makeText(this,
+                        "Please grant write storage access to save photos",
+                        Toast.LENGTH_LONG).show();
             }
         }
     }
@@ -243,9 +269,7 @@ public class PhotoSearchActivity extends DaggerAppCompatActivity implements Sear
     @Override
     protected void onDestroy() {
         super.onDestroy();
-
-        presenter.saveSearchTerms();
-
+        presenter.dispose();
     }
 
 }
