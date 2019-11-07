@@ -41,9 +41,14 @@ public class PhotoSearchPresenter implements SearchScreenContract.UserActionList
     private AppTaskExecutor postTaskExecutor;
     private FavoritePhotoRepository favoritePhotoRepository;
 
-    private int currentPage = 1;
     private String currentTag = "";
     private int currentPhotoPosition = 0;
+
+    private int currentPage = 1;
+
+    private boolean isFirstLoad = true;
+    private int totalPages = 1;
+
     private List<SearchPhoto> photoSearchResults = new ArrayList<>();
     private LinkedList<String> searchTerms = new LinkedList<>();
 
@@ -64,6 +69,11 @@ public class PhotoSearchPresenter implements SearchScreenContract.UserActionList
 
     public void setView(SearchScreenContract.View view) {
         this.view = view;
+    }
+
+    @Override
+    public boolean isLastPage() {
+        return photoSearchResults.size() == totalPages;
     }
 
     /**
@@ -304,7 +314,18 @@ public class PhotoSearchPresenter implements SearchScreenContract.UserActionList
 
                 System.out.println("Total results: "+ photoSearchResults.size());
 
-                view.updatePhotoList();
+                if(isFirstLoad) {
+                    totalPages = searchResultResponse
+                            .getPhotoResult()
+                            .getPageCount();
+
+                    view.onFirstPhotoResultLoad(totalPages);
+
+                    isFirstLoad = false;
+                } else {
+                    view.updatePhotoList();
+                }
+
                 return;
             }
 

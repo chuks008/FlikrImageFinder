@@ -13,7 +13,8 @@ import io.reactivex.schedulers.Schedulers;
 public class BackgroundExecutor implements AppTaskExecutor {
 
     @Inject
-    BackgroundExecutor() {}
+    BackgroundExecutor() {
+    }
 
     @Override
     public Scheduler getScheduler() {

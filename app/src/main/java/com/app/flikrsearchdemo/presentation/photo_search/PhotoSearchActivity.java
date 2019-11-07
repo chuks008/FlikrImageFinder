@@ -22,6 +22,7 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.app.flikrsearchdemo.R;
 import com.app.flikrsearchdemo.presentation.PhotoDetailActivity;
+import com.app.flikrsearchdemo.presentation.adapter.PaginationListener;
 import com.app.flikrsearchdemo.presentation.adapter.photos.PhotoListAdapter;
 import com.app.flikrsearchdemo.presentation.adapter.search_term.SearchTermAdapter;
 import com.app.flikrsearchdemo.presentation.favorites.FavoritePhotosActivity;
@@ -37,13 +38,14 @@ public class PhotoSearchActivity extends DaggerAppCompatActivity implements Sear
 
     private static final String TAG = PhotoSearchActivity.class.getSimpleName();
 
-    private Toolbar toolbar;
     private RecyclerView photoRecyclerView;
     private PhotoListAdapter photoListAdapter;
+    private LinearLayoutManager layoutManager;
     private SwipeRefreshLayout swipeRefreshLayout;
     private SearchTermAdapter searchTermAdapter;
     private RecyclerView searchTermRecyclerView;
     private static final int WRITE_STORAGE_REQUEST = 101;
+    private boolean photoLoadingStatus = false;
 
     @Inject
     PhotoSearchPresenter presenter;
@@ -54,7 +56,7 @@ public class PhotoSearchActivity extends DaggerAppCompatActivity implements Sear
 
         setContentView(R.layout.photo_list_layout);
 
-        toolbar = findViewById(R.id.mainScreenToolbar);
+        Toolbar toolbar = findViewById(R.id.mainScreenToolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setTitle(getResources().getString(R.string.app_name));
 
@@ -62,7 +64,8 @@ public class PhotoSearchActivity extends DaggerAppCompatActivity implements Sear
 
         photoRecyclerView = findViewById(R.id.photoRecyclerView);
         photoListAdapter = new PhotoListAdapter(presenter);
-        photoRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+        layoutManager = new LinearLayoutManager(this);
+        photoRecyclerView.setLayoutManager(layoutManager);
         photoRecyclerView.setAdapter(photoListAdapter);
 
         searchTermRecyclerView = findViewById(R.id.pastTermsRecyclerView);
@@ -131,16 +134,46 @@ public class PhotoSearchActivity extends DaggerAppCompatActivity implements Sear
 
     @Override
     public void updatePhotoList() {
+
+        photoListAdapter.notifyDataSetChanged();
+    }
+
+    @Override
+    public void onFirstPhotoResultLoad(int pageSize) {
+
+        Log.e(TAG, "Setting paginationListener on photo results");
+        Log.e(TAG, "Total pages for photos: "+ pageSize);
+
+        photoRecyclerView.addOnScrollListener(new PaginationListener(layoutManager, pageSize) {
+            @Override
+            protected boolean isLoading() {
+                return photoLoadingStatus;
+            }
+
+            @Override
+            protected boolean isLastPage() {
+                return presenter.isLastPage();
+            }
+
+            @Override
+            protected void loadMoreItems() {
+                Log.e(TAG, "Loading more photos");
+                presenter.loadMorePhotos();
+            }
+        });
+
         photoListAdapter.notifyDataSetChanged();
     }
 
     @Override
     public void hideLoading() {
+        photoLoadingStatus = false;
         swipeRefreshLayout.setRefreshing(false);
     }
 
     @Override
     public void showLoading() {
+        photoLoadingStatus = true;
         swipeRefreshLayout.setRefreshing(true);
     }
 

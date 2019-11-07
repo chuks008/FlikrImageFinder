@@ -43,6 +43,13 @@ public interface SearchScreenContract {
         void showBookmarkSuccess(String message);
 
         void checkPermissions();
+
+        /**
+         * Method used to initialize pagination
+         *
+         * @param pageSize
+         */
+        void onFirstPhotoResultLoad(int pageSize);
     }
 
     interface UserActionListener {
@@ -59,5 +66,7 @@ public interface SearchScreenContract {
         void saveSearchTerms();
         void refreshPhotoList();
         void saveCurrentPhoto();
+
+        boolean isLastPage();
     }
 }
