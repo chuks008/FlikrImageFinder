@@ -40,16 +40,20 @@ public class PhotoSearchPresenter implements SearchScreenContract.UserActionList
     private AppTaskExecutor backgroundExecutor;
     private AppTaskExecutor postTaskExecutor;
     private FavoritePhotoRepository favoritePhotoRepository;
-    private final String NETWORK_ERROR = "Error during search. Check your internet connection";
-    private final String NO_RESULTS_FOUND = "No results found";
+    public static final String NETWORK_ERROR = "Error during search. Check your internet connection";
+    public static final String NO_RESULTS_FOUND = "No results found";
 
     private String currentTag = "";
     private int currentPhotoPosition = 0;
 
     private int currentPage = 1;
 
-    private boolean isFirstLoad = true;
+    private boolean isFirstLoad;
     private int totalPages = 1;
+
+    public void setFirstLoad(boolean firstLoad) {
+        isFirstLoad = firstLoad;
+    }
 
     private List<SearchPhoto> photoSearchResults = new ArrayList<>();
     private LinkedList<String> searchTerms = new LinkedList<>();
@@ -149,6 +153,9 @@ public class PhotoSearchPresenter implements SearchScreenContract.UserActionList
     private void searchForPhotos(String tags) {
 
         view.showLoading();
+
+        System.out.println(backgroundExecutor.getScheduler());
+        System.out.println(postTaskExecutor.getScheduler());
 
         photoSearchRepository.queryImage(currentPage, tags)
                 .subscribeOn(backgroundExecutor.getScheduler())
@@ -273,15 +280,14 @@ public class PhotoSearchPresenter implements SearchScreenContract.UserActionList
 
             if(searchResultResponse.getStatusMessage().equals("ok")){
                 List<ResultPhoto> photos = searchResultResponse.getPhotoResult().getPhotoResultList();
-                for(ResultPhoto photo: photos) {
-                    photoSearchResults.add(generateSearchPhoto(photo));
-                }
 
-                System.out.println("Total results: "+ photoSearchResults.size());
-
-                if(photoSearchResults.size() < 1) {
+                if(photos.size() < 1) {
                     view.showStatusMessageError(NO_RESULTS_FOUND);
                     return;
+                }
+
+                for(ResultPhoto photo: photos) {
+                    photoSearchResults.add(generateSearchPhoto(photo));
                 }
 
                 if(isFirstLoad) {

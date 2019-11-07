@@ -70,6 +70,7 @@ public class PhotoSearchActivity extends DaggerAppCompatActivity implements Sear
 
         presenter.getSearchTerms();
         presenter.setView(this);
+        presenter.setFirstLoad(true);
 
         Log.e(TAG, "Starting search activities");
     }

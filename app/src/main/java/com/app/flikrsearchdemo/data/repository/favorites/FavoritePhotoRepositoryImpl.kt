@@ -81,7 +81,6 @@ class FavoritePhotoRepositoryImpl @Inject constructor (private val db: FlikrDemo
         try {
             Log.e(TAG, "Image location: ${toRemove.photoLocation}")
             Log.e(TAG, "Actual image location: ${Uri.parse(toRemove.photoLocation).path}")
-//           DocumentFile.fromSingleUri(context, Uri.parse(toRemove.photoLocation))?.delete()
             val convertedToFileString = imageFileMgr.getRealPathFromUri(context, Uri.parse(toRemove.photoLocation))
             val file = File(convertedToFileString)
             if(file.exists()) {
